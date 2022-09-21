@@ -15,7 +15,7 @@ router.post(
   authMiddleware.loginCheck,
   rbac.isAdminSeller,
   setDestination,
-  uploader.array("images"),
+  uploader.array("image"),
   prodCtrl.addProduct
 );
 
@@ -27,15 +27,14 @@ router.put(
   authMiddleware.loginCheck,
   rbac.isAdminSeller,
   setDestination,
-  uploader.array("images"),
+  uploader.array("image"),
   prodCtrl.updateProduct
 );
 
-router.delete(
-  "/:id",
-  authMiddleware.loginCheck,
-  rbac.isAdminSeller,
-  prodCtrl.deleteProduct
-);
+router.delete("/:id", authMiddleware.loginCheck, rbac.isAdminSeller, prodCtrl.deleteProduct);
+
+router.get("/cat/:slug", prodCtrl.getProductByCategory);
+
+router.get("/byslug/:slug", prodCtrl.getProductBySlug);
 
 module.exports = router;

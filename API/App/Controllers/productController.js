@@ -35,6 +35,7 @@ class ProductController {
       if (!data.seller) {
         data.seller = null;
       }
+      console.log(data);
       let product = new Product(data);
       let ack = await product.save();
       res.json({
@@ -57,7 +58,8 @@ class ProductController {
       }
       let prods = await Product.find(filter)
         .populate("category")
-        .populate("brands");
+        .populate("brands")
+        .populate("seller");
       res.json({
         result: prods,
         status: true,
@@ -110,7 +112,8 @@ class ProductController {
     try {
       let prod = await Product.findById(req.params.id)
         .populate("category")
-        .populate("brands");
+        .populate("brands")
+        .populate("seller");
       if (prod) {
         res.json({
           result: prod,
@@ -145,6 +148,98 @@ class ProductController {
           status: 400,
           result: null,
           msg: "Product already deleted.",
+        });
+      }
+    } catch (err) {
+      next({
+        status: 500,
+        msg: err,
+      });
+    }
+  };
+
+  getProductByCategory = async (req, res, next) => {
+    try {
+      let products = await Product.aggregate([
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $unwind: {
+            path: "$category",
+          },
+        },
+        {
+          $match: {
+            "category.slug": req.params.slug,
+            status: "active",
+          },
+        },
+        {
+          $lookup: {
+            from: "labels",
+            localField: "brands",
+            foreignField: "_id",
+            as: "brands",
+          },
+        },
+        {
+          $unwind: {
+            path: "$brands",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "seller",
+            foreignField: "_id",
+            as: "seller",
+          },
+        },
+        {
+          $unwind: {
+            path: "$seller",
+          },
+        },
+      ]);
+
+      let filtered = products.filter((item) => item.category.slug === req.params.slug);
+      res.json({
+        result: filtered,
+        status: true,
+        msg: "Product fetched by category",
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getProductBySlug = async (req, res, next) => {
+    try {
+      let prod = await Product.findOne({ slug: req.params.slug })
+        .populate("category")
+        .populate("brands")
+        .populate("seller");
+
+      let related_prods = await Product.find({ category: prod.category._id, status: "active" })
+        .populate("category")
+        .populate("brands")
+        .populate("seller");
+      if (prod) {
+        res.json({
+          result: { detail: prod, related: related_prods },
+          status: true,
+          msg: "Fetched product succesfully",
+        });
+      } else {
+        next({
+          status: 500,
+          msg: "This product does not exists.",
         });
       }
     } catch (err) {

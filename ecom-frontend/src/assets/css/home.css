@@ -1,0 +1,14 @@
+.thumb-small {
+  max-width: 150px;
+  max-height: 120px;
+  background: #e6e6e6;
+}
+
+.product-thumbnail {
+  min-height: 150px;
+  overflow: hidden;
+  background-size: contain;
+  max-width: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}

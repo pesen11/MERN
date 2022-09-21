@@ -127,6 +127,21 @@ class AuthController {
           });*/
         let hash = bcrypt.hashSync(data.password, 10);
         data.password = hash;
+
+        if (data.role) {
+          data.role = data.role.split(",");
+        }
+
+        data.address = {
+          billing: {
+            address: data.address_billing_address,
+            house_no: data.address_billing_house_no,
+          },
+          shipping: {
+            address: data.address_shipping_address,
+            house_no: data.address_shipping_house_no,
+          },
+        };
         let user = new User(data);
 
         user
@@ -150,6 +165,18 @@ class AuthController {
         status: 400,
         msg: error,
       });
+    }
+  };
+
+  verifyUser = (req, res, next) => {
+    if (req.auth_user) {
+      res.json({
+        result: req.auth_user,
+        msg: "Verified",
+        status: true,
+      });
+    } else {
+      next({ status: 403, msg: "Unauthorized" });
     }
   };
 }

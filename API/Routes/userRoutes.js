@@ -4,7 +4,14 @@ const router = express.Router();
 const authMiddleware = require("../App/Middleware/authMiddleware");
 const rbac = require("../App/Middleware/rbacMiddleware");
 const userController = require("../App/Controllers/userController");
+const uploader = require("../App/Middleware/uploadMiddleware");
+
 let user_obj = new userController();
+
+let setDestination = (req, res, next) => {
+  req.dest = "users";
+  next();
+};
 
 // app.get("/user", (req, res, next) => {
 //   //
@@ -22,14 +29,18 @@ let user_obj = new userController();
 //   //
 // });
 
-router
-  .route("/")
-  .get(authMiddleware.loginCheck, rbac.isAdmin, user_obj.getAllUsers);
+router.route("/").get(authMiddleware.loginCheck, rbac.isAdmin, user_obj.getAllUsers);
 
 router
   .route("/:id")
-  .put(user_obj.updateUserById)
-  .delete(user_obj.deleteUserById)
+  .put(
+    authMiddleware.loginCheck,
+    rbac.isAdmin,
+    setDestination,
+    uploader.single("image"),
+    user_obj.updateUserById
+  )
+  .delete(authMiddleware.loginCheck, rbac.isAdmin, user_obj.deleteUserById)
   .get(user_obj.getUserById);
 
 module.exports = router;

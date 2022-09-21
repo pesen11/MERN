@@ -4,9 +4,11 @@ const routes = require("./Routes/route.js");
 const path = require("path");
 const mongoose = require("mongoose");
 const dbUrl = "mongodb://127.0.0.1:27017/apiDB";
+const cors = require("cors");
 
 const myEvent = require("./App/Events/events");
 
+app.use(cors());
 app.use((req, res, next) => {
   req.myEvent = myEvent;
   next();

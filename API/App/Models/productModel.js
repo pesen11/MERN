@@ -52,7 +52,7 @@ const productSchema = new Schema(
       ref: "Category",
       required: true,
     },
-    stock: {
+    status: {
       type: String,
       enum: ["active", "inactive", "out-of-stock"],
       default: "inactive",

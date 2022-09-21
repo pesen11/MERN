@@ -1,202 +1,136 @@
 // import "bootstrap/dist/css/bootstrap.min.css";
 
-import { Carousel, Card, Row, Col } from "react-bootstrap";
+import { Carousel, Card, Row, Col, Container } from "react-bootstrap";
+import { getLabelByType } from "../../services/labelService";
 
 import { useEffect, useState } from "react";
+import SliderComponent from "../../component/common/slider/sliderComponent";
+import { NavLink } from "react-router-dom";
+import CardLayout from "../../component/common/cardlayout/cardLayoutComponent";
+import SingleProductView from "../../component/common/singleProductView/singleProductViewComponent";
+import { getProducts } from "../../services/productService";
+
+import noImageFound from "../../images/noImage.jpg";
+import { getCategories } from "../../services/categoryService";
 
 const HomePage = () => {
   let [banners, setBanners] = useState();
   let [brands, setBrands] = useState();
+  let [cats, setCats] = useState();
+  let [products, setProducts] = useState();
 
-  let getAllBanners = () => {
-    setBanners([
-      {
-        _id: "62e0c0859b505b18404400d2",
-        title: "FirstBanner",
-        image: "1658896517251-banner1.jpg",
-        link: null,
-        slug: "firstbanner",
-        type: "banner",
-        status: "active",
-        createdAt: "2022-07-27T04:35:17.271Z",
-        updatedAt: "2022-07-27T04:35:17.271Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0c09a9b505b18404400d7",
-        title: "SecondBanner",
-        image: "1658896538969-banner2.jpg",
-        link: null,
-        slug: "secondbanner",
-        type: "banner",
-        status: "active",
-        createdAt: "2022-07-27T04:35:38.975Z",
-        updatedAt: "2022-07-27T04:35:38.975Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0c0ce9b505b18404400e1",
-        title: "ThirdBanner",
-        image: "1658896590278-banner3.jpg",
-        link: null,
-        slug: "thirdbanner",
-        type: "banner",
-        status: "active",
-        createdAt: "2022-07-27T04:36:30.287Z",
-        updatedAt: "2022-07-27T04:36:30.287Z",
-        __v: 0,
-      },
-    ]);
+  let getAllBanners = async () => {
+    let result = await getLabelByType("banner");
+    if (result) {
+      let all_active_banners = result.result.filter((item) => item.status === "active");
+      setBanners(all_active_banners);
+    }
   };
 
-  let getAllBrands = () => {
-    setBrands([
-      {
-        _id: "62e0ca7fa7f39e9da27896e4",
-        title: "Samsung",
-        image: "1658899070994-samsung.png",
-        link: null,
-        slug: "samsung",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:17:51.020Z",
-        updatedAt: "2022-07-27T05:17:51.020Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0ca8ea7f39e9da27896e9",
-        title: "Apple",
-        image: "1658899086254-Apple_logo_black.png",
-        link: null,
-        slug: "apple",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:18:06.257Z",
-        updatedAt: "2022-07-27T05:18:06.257Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0caa5a7f39e9da27896ee",
-        title: "Dell",
-        image: "1658899109523-Dell_Logo.png",
-        link: null,
-        slug: "dell",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:18:29.527Z",
-        updatedAt: "2022-07-27T05:18:29.527Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0cab0a7f39e9da27896f3",
-        title: "Lenovo",
-        image: "1658899120826-lenovo-logo.png",
-        link: null,
-        slug: "lenovo",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:18:40.829Z",
-        updatedAt: "2022-07-27T05:18:40.829Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0cac1a7f39e9da27896f8",
-        title: "Asus Rog",
-        image: "1658904467515-asusrog.png",
-        link: null,
-        slug: "asusrog",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:18:57.642Z",
-        updatedAt: "2022-07-27T05:18:57.642Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0cacda7f39e9da27896fd",
-        title: "Razer",
-        image: "1658899149591-Razer_(2).png",
-        link: null,
-        slug: "razer",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:19:09.595Z",
-        updatedAt: "2022-07-27T05:19:09.595Z",
-        __v: 0,
-      },
-      {
-        _id: "62e0caeba7f39e9da2789702",
-        title: "HP",
-        image: "1658899179286-2048px-HP_logo.png",
-        link: null,
-        slug: "hp",
-        type: "brand",
-        status: "active",
-        createdAt: "2022-07-27T05:19:39.326Z",
-        updatedAt: "2022-07-27T05:19:39.326Z",
-        __v: 0,
-      },
-    ]);
+  let getAllBrands = async () => {
+    let result = await getLabelByType("brand");
+    if (result) {
+      setBrands(result.result);
+    }
+  };
+
+  let getAllCategories = async () => {
+    let result = await getCategories();
+    if (result) {
+      let all_cats = result.result.filter(
+        (item) => item.show_in_homepage === true && item.status === "active"
+      );
+      setCats(all_cats);
+    }
+  };
+
+  let getAllProducts = async () => {
+    let result = await getProducts();
+    if (result.result) {
+      let all_products = result.result.filter((item) => item.status === "active");
+      setProducts(all_products);
+    }
   };
 
   useEffect(() => {
     getAllBanners();
     getAllBrands();
+    getAllCategories();
+    getAllProducts();
+    // console.log(products);
   }, []);
 
   return (
     <>
-      <Carousel fade>
-        {banners &&
-          banners.map((item, index) => (
-            <Carousel.Item key={index}>
-              <img
-                className="d-block w-100"
-                height={344}
-                width={988}
-                src={
-                  process.env.REACT_APP_BE_URL +
-                  "Uploads/label_image/" +
-                  item.image
-                }
-                alt="First slide"
-              />
-            </Carousel.Item>
-          ))}
-      </Carousel>
+      <SliderComponent data={banners} type="label_image"></SliderComponent>
       <hr />
       <h4 className="text-center mt-4 mb-4">Brands</h4>
       <hr />
-      <Row className="">
-        {brands &&
-          brands.map((item, index) => (
-            <Col
-              sm={6}
-              md={{
-                offset: 0,
-                span: 3,
-              }}
-              key={index}
-            >
-              <Card style={{ width: "16rem" }} className="mb-2 ">
-                <Card.Body>
-                  <Card.Title>{item.title}</Card.Title>
-                </Card.Body>
+      <Container>
+        <Row className="">
+          {brands &&
+            brands.map((item, index) => (
+              <Col
+                sm={6}
+                md={{
+                  offset: 0,
+                  span: 3,
+                }}
+                key={index}
+              >
+                <Card style={{ width: "16rem" }} className="mb-2 ">
+                  <Card.Body>
+                    <Card.Title>{item.title}</Card.Title>
+                  </Card.Body>
 
-                <img
-                  className="mx-auto my-auto"
-                  height={150}
-                  width={150}
-                  src={
-                    process.env.REACT_APP_BE_URL +
-                    "Uploads/label_image/" +
-                    item.image
-                  }
-                  alt="myimg"
-                ></img>
-              </Card>
-            </Col>
-          ))}
-      </Row>
+                  <img
+                    className="mx-auto my-auto"
+                    height={150}
+                    width={150}
+                    src={process.env.REACT_APP_BE_URL + "Uploads/label_image/" + item.image}
+                    alt="myimg"
+                  ></img>
+                </Card>
+              </Col>
+            ))}
+        </Row>
+      </Container>
+
+      <Container>
+        <Row className="mt-3">
+          <Col sm={12}>
+            <h4 className="text-center">Categories</h4>
+            <hr />
+          </Col>
+        </Row>
+
+        <Row className="mt-4">
+          {cats &&
+            cats.map((item, index) => (
+              <Col sm={6} md={2} key={index}>
+                <CardLayout data={item} type="category"></CardLayout>
+              </Col>
+            ))}
+        </Row>
+      </Container>
+
+      <Container>
+        <Row className="my-5">
+          <Col sm={12}>
+            <h4 className="text-center">All Products</h4>
+            <hr />
+          </Col>
+        </Row>
+
+        <Row>
+          {products &&
+            products.map((item, index) => (
+              <Col sm={6} md={3} className="mt-3" key={index}>
+                <SingleProductView data={item} type={"product"} />
+              </Col>
+            ))}
+        </Row>
+      </Container>
     </>
   );
 };

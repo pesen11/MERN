@@ -22,18 +22,20 @@ class AuthService {
     }
   };
 
-  registrationValidate = (data) => {
+  registrationValidate = (data, is_edit = false) => {
     let err_msg = {};
     if (!data.name) {
       err_msg["name"] = "Name is required.";
     }
 
-    if (!data.email) {
-      err_msg["email"] = "Email is required.";
-    }
+    if (!is_edit) {
+      if (!data.email) {
+        err_msg["email"] = "Email is required.";
+      }
 
-    if (!data.password) {
-      err_msg["password"] = "Password is required.";
+      if (!data.password) {
+        err_msg["password"] = "Password is required.";
+      }
     }
 
     if (!data.role) {

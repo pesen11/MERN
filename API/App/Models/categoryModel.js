@@ -26,7 +26,7 @@ const categoryModel = new Schema(
       ref: "Category",
       default: null,
     },
-    brand: [
+    brands: [
       {
         type: mongoose.Types.ObjectId,
         ref: "Label",

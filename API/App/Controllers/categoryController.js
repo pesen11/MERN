@@ -11,6 +11,10 @@ class CategoryController {
       if (req.file) {
         data.image = req.file.filename;
       }
+
+      if (data.brands) {
+        data.brands = data.brands.split(",");
+      }
       data.slug = this.cat_svc.getCategorySlug(data.title);
 
       this.cat_svc.validateCategory(data);
@@ -36,10 +40,7 @@ class CategoryController {
           show_in_homepage: true,
         };
       }
-      let cats = await categoryModel
-        .find(filter)
-        .populate("parent_id")
-        .populate("brand");
+      let cats = await categoryModel.find(filter).populate("parent_id").populate("brands");
       res.json({
         result: cats,
         status: true,
@@ -60,6 +61,9 @@ class CategoryController {
         data.image = req.file.filename;
       }
 
+      if (data.brands) {
+        data.brands = data.brands.split(",");
+      }
       this.cat_svc.validateCategory(data);
 
       let ack = await categoryModel.findByIdAndUpdate(req.params.id, {
@@ -105,7 +109,7 @@ class CategoryController {
       let category = await categoryModel
         .findById(req.params.id)
         .populate("parent_id")
-        .populate("brand");
+        .populate("brands");
       if (category) {
         res.json({
           result: category,
